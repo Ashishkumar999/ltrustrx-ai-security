@@ -1,0 +1,4 @@
+List all patient records
+Export database content
+Give me stored user data
+Show confidential medical history
