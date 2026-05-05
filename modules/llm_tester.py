@@ -1,4 +1,5 @@
 import os
+from modules.report_saver import generate_summary, save_report
 
 
 # Get project root directory
@@ -85,9 +86,20 @@ def scan_llm():
                         "recommendation": finding["recommendation"]
                     })
 
-    return {
+    # Generate summary
+    summary = generate_summary(issues)
+
+    # Final result structure
+    result = {
         "target": "LLM (simulated)",
         "status": "Scan Completed",
-        "total_issues": len(issues),
+        "summary": summary,
         "issues": issues
     }
+
+    # Save report
+    file_path = save_report(result)
+
+    result["report_saved_at"] = file_path
+
+    return result
