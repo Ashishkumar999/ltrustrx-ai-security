@@ -2,14 +2,18 @@ from fastapi import APIRouter, Request, Form
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
+from modules.database import (
+    init_db,
+    create_user,
+    validate_user
+)
+
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
 
-# Temporary demo user database
-users = {
-    "admin": "admin123"
-}
+# Initialize database
+init_db()
 
 
 @router.get("/login", response_class=HTMLResponse)
@@ -28,7 +32,9 @@ async def login(
     password: str = Form(...)
 ):
 
-    if username in users and users[username] == password:
+    user = validate_user(username, password)
+
+    if user:
 
         response = RedirectResponse(
             url="/",
@@ -47,6 +53,40 @@ async def login(
         name="login.html",
         context={
             "error": "Invalid username or password"
+        }
+    )
+
+
+@router.get("/signup", response_class=HTMLResponse)
+async def signup_page(request: Request):
+
+    return templates.TemplateResponse(
+        request=request,
+        name="signup.html"
+    )
+
+
+@router.post("/signup")
+async def signup(
+    request: Request,
+    username: str = Form(...),
+    password: str = Form(...)
+):
+
+    success = create_user(username, password)
+
+    if success:
+
+        return RedirectResponse(
+            url="/login",
+            status_code=302
+        )
+
+    return templates.TemplateResponse(
+        request=request,
+        name="signup.html",
+        context={
+            "error": "Username already exists"
         }
     )
 

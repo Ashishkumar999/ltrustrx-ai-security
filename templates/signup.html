@@ -7,7 +7,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>LtrustRx Login</title>
+    <title>LtrustRx Signup</title>
 
     <style>
 
@@ -24,7 +24,7 @@
             margin: 0;
         }
 
-        .login-box {
+        .signup-box {
 
             background-color: #1e293b;
 
@@ -84,17 +84,21 @@
             margin-top: 15px;
         }
 
+        a {
+            color: #38bdf8;
+        }
+
     </style>
 
 </head>
 
 <body>
 
-<div class="login-box">
+<div class="signup-box">
 
-    <h1>LtrustRx Login 🔐</h1>
+    <h1>Create Account 🚀</h1>
 
-    <form method="POST" action="/login">
+    <form method="POST" action="/signup">
 
         <input
             type="text"
@@ -111,15 +115,15 @@
         >
 
         <button type="submit">
-            Login
+            Signup
         </button>
 
     </form>
 
-   <p>
-    Don't have an account?
-    <a href="/signup">Signup</a>
-   </p>
+    <p>
+        Already have an account?
+        <a href="/login">Login</a>
+    </p>
 
     {% if error %}
 
