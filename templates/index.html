@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LtrustRx AI Security Scanner</title>
+
+    <style>
+        body {
+            background-color: #0f172a;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: auto;
+            padding-top: 50px;
+        }
+
+        .card {
+            background-color: #1e293b;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #38bdf8;
+            font-size: 48px;
+        }
+
+        p {
+            color: #cbd5e1;
+            font-size: 18px;
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 15px 30px;
+            background-color: #38bdf8;
+            color: black;
+            text-decoration: none;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .button:hover {
+            background-color: #0ea5e9;
+        }
+
+        .result-card {
+            background-color: #111827;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 15px;
+            border-left: 8px solid #38bdf8;
+        }
+
+        .severity-high {
+            border-left-color: red;
+        }
+
+        .severity-medium {
+            border-left-color: orange;
+        }
+
+        .severity-info {
+            border-left-color: #38bdf8;
+        }
+
+        code {
+            color: #38bdf8;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+        <h1>LtrustRx AI Security Scanner 🚀</h1>
+
+        <p>
+            AI Security Testing Platform for Healthcare Applications
+        </p>
+
+        <a href="/scan/ui" class="button">
+            Run LLM Security Scan
+        </a>
+    </div>
+
+    {% if results %}
+
+        <div class="card">
+            <h2>Scan Results</h2>
+
+            <p>Total Findings: <strong>{{ results.summary.total }}</strong></p>
+
+            {% for issue in results.issues %}
+
+            <div class="result-card severity-{{ issue.severity.lower() }}">
+                <h3>{{ issue.issue }}</h3>
+
+                <p><strong>Severity:</strong> {{ issue.severity }}</p>
+
+                <p><strong>Payload:</strong></p>
+                <code>{{ issue.payload }}</code>
+
+                <p><strong>Recommendation:</strong></p>
+                <p>{{ issue.recommendation }}</p>
+            </div>
+
+            {% endfor %}
+        </div>
+
+    {% endif %}
+
+</div>
+
+</body>
+</html>
