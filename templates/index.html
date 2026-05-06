@@ -115,9 +115,20 @@
 
                 <p><strong>Recommendation:</strong></p>
                 <p>{{ issue.recommendation }}</p>
+                 {% if results.pdf_report %}
+
+               <p>
+                   <a href="/{{ results.pdf_report }}" class="button">
+                       Download PDF Report
+                   </a>
+               </p>
+
+                {% endif %}
+
             </div>
 
             {% endfor %}
+
         </div>
 
     {% endif %}

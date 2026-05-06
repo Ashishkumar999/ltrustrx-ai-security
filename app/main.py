@@ -1,12 +1,15 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 from app.routes.api_scan import router as api_router
 from app.routes.llm_scan import router as llm_router
 from app.routes.ui_scan import router as ui_router
 
 app = FastAPI()
+
+app.mount("/reports", StaticFiles(directory="reports"), name="reports")
 
 templates = Jinja2Templates(directory="templates")
 

@@ -3,6 +3,7 @@ from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
 from modules.llm_tester import scan_llm
+from modules.pdf_report import generate_pdf_report
 
 router = APIRouter()
 
@@ -13,6 +14,10 @@ templates = Jinja2Templates(directory="templates")
 async def run_ui_scan(request: Request):
 
     results = scan_llm()
+
+    pdf_path = generate_pdf_report(results)
+
+    results["pdf_report"] = pdf_path
 
     return templates.TemplateResponse(
         request=request,
