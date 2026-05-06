@@ -1,11 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LtrustRx AI Security Scanner</title>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
+
         body {
             background-color: #0f172a;
             color: white;
@@ -15,7 +19,7 @@
         }
 
         .container {
-            width: 80%;
+            width: 90%;
             margin: auto;
             padding-top: 50px;
         }
@@ -54,12 +58,43 @@
             background-color: #0ea5e9;
         }
 
+        .dashboard-layout {
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+            margin-top: 30px;
+        }
+
+        .results-grid {
+            flex: 3;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
+        .analytics-panel {
+            flex: 1;
+            background-color: #1e293b;
+            padding: 20px;
+            border-radius: 20px;
+            position: sticky;
+            top: 20px;
+            text-align: center;
+        }
+
+        .chart-container {
+            width: 100%;
+            max-width: 300px;
+            margin: auto;
+        }
+
         .result-card {
             background-color: #111827;
-            padding: 20px;
-            margin-top: 20px;
+            padding: 15px;
             border-radius: 15px;
-            border-left: 8px solid #38bdf8;
+            border-left: 6px solid #38bdf8;
+            word-wrap: break-word;
+            text-align: center;
         }
 
         .severity-high {
@@ -70,14 +105,23 @@
             border-left-color: orange;
         }
 
+        .severity-low {
+            border-left-color: green;
+        }
+
         .severity-info {
             border-left-color: #38bdf8;
         }
 
         code {
             color: #38bdf8;
+            display: block;
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
+
     </style>
+
 </head>
 
 <body>
@@ -85,6 +129,7 @@
 <div class="container">
 
     <div class="card">
+
         <h1>LtrustRx AI Security Scanner 🚀</h1>
 
         <p>
@@ -94,34 +139,38 @@
         <a href="/scan/ui" class="button">
             Run LLM Security Scan
         </a>
+
     </div>
 
     {% if results %}
 
-        <div class="card">
-            <h2>Scan Results</h2>
+    <div class="dashboard-layout">
 
-            <p>Total Findings: <strong>{{ results.summary.total }}</strong></p>
+        <div class="results-grid">
 
             {% for issue in results.issues %}
 
             <div class="result-card severity-{{ issue.severity.lower() }}">
+
                 <h3>{{ issue.issue }}</h3>
 
                 <p><strong>Severity:</strong> {{ issue.severity }}</p>
 
                 <p><strong>Payload:</strong></p>
+
                 <code>{{ issue.payload }}</code>
 
                 <p><strong>Recommendation:</strong></p>
-                <p>{{ issue.recommendation }}</p>
-                 {% if results.pdf_report %}
 
-               <p>
-                   <a href="/{{ results.pdf_report }}" class="button">
-                       Download PDF Report
-                   </a>
-               </p>
+                <p>{{ issue.recommendation }}</p>
+
+                {% if results.pdf_report %}
+
+                <p>
+                    <a href="/{{ results.pdf_report }}" class="button">
+                        Download PDF Report
+                    </a>
+                </p>
 
                 {% endif %}
 
@@ -130,6 +179,68 @@
             {% endfor %}
 
         </div>
+
+        <div class="analytics-panel">
+
+            <h2>Severity Analytics</h2>
+
+            <div class="chart-container">
+                <canvas id="severityChart"></canvas>
+            </div>
+
+        </div>
+
+    </div>
+
+    <script>
+
+    const ctx = document.getElementById('severityChart');
+
+    new Chart(ctx, {
+        type: 'pie',
+
+        data: {
+            labels: ['High', 'Medium', 'Low', 'Info'],
+
+            datasets: [{
+                data: [
+                    {{ results.summary.high }},
+                    {{ results.summary.medium }},
+                    {{ results.summary.low }},
+                    {{ results.summary.info }}
+                ],
+
+                backgroundColor: [
+                    '#ef4444',
+                    '#f59e0b',
+                    '#22c55e',
+                    '#38bdf8'
+                ]
+            }]
+        },
+
+       options: {
+            responsive: true,
+            maintainAspectRatio: true,
+
+    plugins: {
+        legend: {
+            position: 'bottom',
+
+            labels: {
+                color: 'white',
+                padding: 15,
+                boxWidth: 20,
+                font: {
+                    size: 14
+                }
+            }
+        }
+    }
+}
+    });
+
+    </script>
 
     {% endif %}
 
