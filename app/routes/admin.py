@@ -2,6 +2,9 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
+from modules.logger import write_log
+
+
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
@@ -11,6 +14,11 @@ templates = Jinja2Templates(directory="templates")
 async def admin_dashboard(request: Request):
 
     role = request.cookies.get("role")
+
+    username = request.cookies.get("user")
+
+    if role == "admin":
+        write_log("ADMIN_ACCESS", username)
 
     if role != "admin":
 

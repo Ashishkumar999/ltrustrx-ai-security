@@ -1,22 +1,17 @@
 from fastapi import APIRouter, Request, Form
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from modules.database import (
-    init_db,
-    create_user,
-    validate_user
-)
+from modules.database import create_user, validate_user
+from modules.logger import write_log
+
 
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
 
-# Initialize database
-init_db()
 
-
-@router.get("/login", response_class=HTMLResponse)
+@router.get("/login")
 async def login_page(request: Request):
 
     return templates.TemplateResponse(
@@ -36,6 +31,8 @@ async def login(
 
     if user:
 
+        write_log("LOGIN_SUCCESS", username)
+
         response = RedirectResponse(
             url="/",
             status_code=302
@@ -49,26 +46,29 @@ async def login(
         response.set_cookie(
             key="role",
             value=user["role"]
-       )
+        )
 
         return response
+
+    write_log("LOGIN_FAILED", username)
 
     return templates.TemplateResponse(
         request=request,
         name="login.html",
         context={
-            "error": "Invalid username or password"
+            "error": "Invalid credentials"
         }
     )
 
 
-@router.get("/signup", response_class=HTMLResponse)
+@router.get("/signup")
 async def signup_page(request: Request):
 
     return templates.TemplateResponse(
         request=request,
         name="signup.html"
     )
+
 
 @router.post("/signup")
 async def signup(
@@ -103,8 +103,13 @@ async def signup(
         }
     )
 
+
 @router.get("/logout")
-async def logout():
+async def logout(request: Request):
+
+    username = request.cookies.get("user")
+
+    write_log("LOGOUT", username)
 
     response = RedirectResponse(
         url="/login",
@@ -112,5 +117,6 @@ async def logout():
     )
 
     response.delete_cookie("user")
+    response.delete_cookie("role")
 
     return response
