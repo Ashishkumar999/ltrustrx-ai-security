@@ -1,4 +1,5 @@
 import sqlite3
+import bcrypt
 
 
 DATABASE_NAME = "ltrust.db"
@@ -26,7 +27,9 @@ def init_db():
 
         username TEXT UNIQUE NOT NULL,
 
-        password TEXT NOT NULL
+        password TEXT NOT NULL,
+
+        role TEXT NOT NULL
     )
     """)
 
@@ -35,17 +38,39 @@ def init_db():
     conn.close()
 
 
-def create_user(username, password):
+def hash_password(password):
+
+    salt = bcrypt.gensalt()
+
+    hashed = bcrypt.hashpw(
+        password.encode(),
+        salt
+    )
+
+    return hashed.decode()
+
+
+def verify_password(password, hashed_password):
+
+    return bcrypt.checkpw(
+        password.encode(),
+        hashed_password.encode()
+    )
+
+
+def create_user(username, password, role="user"):
 
     conn = get_connection()
 
     cursor = conn.cursor()
 
+    hashed_password = hash_password(password)
+
     try:
 
         cursor.execute(
-            "INSERT INTO users (username, password) VALUES (?, ?)",
-            (username, password)
+            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
+            (username, hashed_password, role)
         )
 
         conn.commit()
@@ -68,12 +93,20 @@ def validate_user(username, password):
     cursor = conn.cursor()
 
     cursor.execute(
-        "SELECT * FROM users WHERE username=? AND password=?",
-        (username, password)
+        "SELECT * FROM users WHERE username=?",
+        (username,)
     )
 
     user = cursor.fetchone()
 
     conn.close()
 
-    return user
+    if not user:
+        return False
+
+    stored_password = user["password"]
+
+    if verify_password(password, stored_password):
+        return user
+
+    return False

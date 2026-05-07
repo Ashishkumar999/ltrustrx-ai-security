@@ -46,6 +46,11 @@ async def login(
             value=username
         )
 
+        response.set_cookie(
+            key="role",
+            value=user["role"]
+       )
+
         return response
 
     return templates.TemplateResponse(
@@ -65,7 +70,6 @@ async def signup_page(request: Request):
         name="signup.html"
     )
 
-
 @router.post("/signup")
 async def signup(
     request: Request,
@@ -73,7 +77,16 @@ async def signup(
     password: str = Form(...)
 ):
 
-    success = create_user(username, password)
+    role = "user"
+
+    if username == "admin":
+        role = "admin"
+
+    success = create_user(
+        username,
+        password,
+        role
+    )
 
     if success:
 
@@ -89,7 +102,6 @@ async def signup(
             "error": "Username already exists"
         }
     )
-
 
 @router.get("/logout")
 async def logout():
