@@ -1,10 +1,19 @@
-from fastapi import APIRouter, Request, Form
+from fastapi import APIRouter, Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from modules.database import create_user, validate_user
+from modules.database import (
+    create_user,
+    validate_user
+)
+
 from modules.logger import write_log
 
+from modules.security import (
+    is_blocked,
+    record_failed_attempt,
+    reset_attempts
+)
 
 router = APIRouter()
 
@@ -21,21 +30,37 @@ async def login_page(request: Request):
 
 
 @router.post("/login")
-async def login(
-    request: Request,
-    username: str = Form(...),
-    password: str = Form(...)
-):
+async def login_post(request: Request):
+
+    form = await request.form()
+
+    username = form.get("username")
+
+    password = form.get("password")
+
+    # RATE LIMIT CHECK
+
+    if is_blocked(username):
+
+        return templates.TemplateResponse(
+            request=request,
+            name="login.html",
+            context={
+                "error": "Too many failed attempts. Try again later."
+            }
+        )
 
     user = validate_user(username, password)
 
     if user:
 
+        reset_attempts(username)
+
         write_log("LOGIN_SUCCESS", username)
 
         response = RedirectResponse(
             url="/",
-            status_code=302
+            status_code=303
         )
 
         response.set_cookie(
@@ -50,13 +75,17 @@ async def login(
 
         return response
 
+    # FAILED LOGIN
+
+    record_failed_attempt(username)
+
     write_log("LOGIN_FAILED", username)
 
     return templates.TemplateResponse(
         request=request,
         name="login.html",
         context={
-            "error": "Invalid credentials"
+            "error": "Invalid username or password"
         }
     )
 
@@ -71,52 +100,34 @@ async def signup_page(request: Request):
 
 
 @router.post("/signup")
-async def signup(
-    request: Request,
-    username: str = Form(...),
-    password: str = Form(...)
-):
+async def signup_post(request: Request):
 
-    role = "user"
+    form = await request.form()
 
-    if username == "admin":
-        role = "admin"
+    username = form.get("username")
 
-    success = create_user(
-        username,
-        password,
-        role
-    )
+    password = form.get("password")
 
-    if success:
+    create_user(username, password)
 
-        return RedirectResponse(
-            url="/login",
-            status_code=302
-        )
+    write_log("SIGNUP", username)
 
-    return templates.TemplateResponse(
-        request=request,
-        name="signup.html",
-        context={
-            "error": "Username already exists"
-        }
+    return RedirectResponse(
+        url="/login",
+        status_code=303
     )
 
 
 @router.get("/logout")
-async def logout(request: Request):
-
-    username = request.cookies.get("user")
-
-    write_log("LOGOUT", username)
+async def logout():
 
     response = RedirectResponse(
         url="/login",
-        status_code=302
+        status_code=303
     )
 
     response.delete_cookie("user")
+
     response.delete_cookie("role")
 
     return response
