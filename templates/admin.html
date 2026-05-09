@@ -10,20 +10,56 @@
     <style>
 
         body {
-            background-color: #0f172a;
+
+            background: #081028;
+
             color: white;
-            font-family: Arial, sans-serif;
-            text-align: center;
-            padding-top: 100px;
+
+            font-family: Arial;
+
+            padding: 40px;
         }
 
         h1 {
-            color: #ef4444;
-            font-size: 48px;
+
+            color: #38bdf8;
+
+            margin-bottom: 30px;
         }
 
-        p {
-            font-size: 20px;
+        table {
+
+            width: 100%;
+
+            border-collapse: collapse;
+
+            background: #111c44;
+        }
+
+        th, td {
+
+            padding: 15px;
+
+            border: 1px solid #1e3a8a;
+
+            text-align: center;
+        }
+
+        th {
+
+            background: #38bdf8;
+
+            color: black;
+        }
+
+        tr:hover {
+
+            background: #1e293b;
+        }
+
+        a {
+
+            color: #38bdf8;
         }
 
     </style>
@@ -32,11 +68,65 @@
 
 <body>
 
-    <h1>Admin Dashboard 🔥</h1>
+    <h1>Admin Scan History Dashboard 🚀</h1>
 
-    <p>
-        Welcome Admin
-    </p>
+    <table>
+
+        <tr>
+
+            <th>User</th>
+
+            <th>Target</th>
+
+            <th>Total</th>
+
+            <th>High</th>
+
+            <th>Medium</th>
+
+            <th>Low</th>
+
+            <th>Info</th>
+
+            <th>Report</th>
+
+            <th>Date</th>
+
+        </tr>
+
+        {% for scan in scans %}
+
+        <tr>
+
+            <td>{{ scan.username }}</td>
+
+            <td>{{ scan.target }}</td>
+
+            <td>{{ scan.total_issues }}</td>
+
+            <td>{{ scan.high }}</td>
+
+            <td>{{ scan.medium }}</td>
+
+            <td>{{ scan.low }}</td>
+
+            <td>{{ scan.info }}</td>
+
+            <td>
+
+                <a href="/{{ scan.report_path }}">
+                    PDF
+                </a>
+
+            </td>
+
+            <td>{{ scan.created_at }}</td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
 
 </body>
 

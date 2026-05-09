@@ -63,14 +63,22 @@ async def login_post(request: Request):
             status_code=303
         )
 
+        # SECURE COOKIES
+
         response.set_cookie(
             key="user",
-            value=username
+            value=username,
+            httponly=True,
+            secure=False,
+            samesite="Strict"
         )
 
         response.set_cookie(
             key="role",
-            value=user["role"]
+            value=user["role"],
+            httponly=True,
+            secure=False,
+            samesite="Strict"
         )
 
         return response

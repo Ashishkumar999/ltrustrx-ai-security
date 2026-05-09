@@ -1,112 +1,189 @@
 import sqlite3
-import bcrypt
+import hashlib
 
 
-DATABASE_NAME = "ltrust.db"
+# DATABASE CONNECTION
+
+conn = sqlite3.connect("ltrust.db", check_same_thread=False)
+
+conn.row_factory = sqlite3.Row
+
+cursor = conn.cursor()
 
 
-def get_connection():
+# USERS TABLE
 
-    conn = sqlite3.connect(DATABASE_NAME)
+cursor.execute("""
 
-    conn.row_factory = sqlite3.Row
+CREATE TABLE IF NOT EXISTS users (
 
-    return conn
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+    username TEXT UNIQUE,
+
+    password TEXT,
+
+    role TEXT DEFAULT 'user'
+
+)
+
+""")
+
+conn.commit()
 
 
-def init_db():
+# SCAN HISTORY TABLE
 
-    conn = get_connection()
+cursor.execute("""
 
-    cursor = conn.cursor()
+CREATE TABLE IF NOT EXISTS scan_history (
 
-    cursor.execute("""
-    CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
 
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT,
 
-        username TEXT UNIQUE NOT NULL,
+    target TEXT,
 
-        password TEXT NOT NULL,
+    total_issues INTEGER,
 
-        role TEXT NOT NULL
-    )
-    """)
+    high INTEGER,
 
-    conn.commit()
+    medium INTEGER,
 
-    conn.close()
+    low INTEGER,
 
+    info INTEGER,
+
+    report_path TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+)
+
+""")
+
+conn.commit()
+
+
+# HASH PASSWORD
 
 def hash_password(password):
 
-    salt = bcrypt.gensalt()
-
-    hashed = bcrypt.hashpw(
-        password.encode(),
-        salt
-    )
-
-    return hashed.decode()
+    return hashlib.sha256(password.encode()).hexdigest()
 
 
-def verify_password(password, hashed_password):
-
-    return bcrypt.checkpw(
-        password.encode(),
-        hashed_password.encode()
-    )
-
+# CREATE USER
 
 def create_user(username, password, role="user"):
 
-    conn = get_connection()
-
-    cursor = conn.cursor()
-
     hashed_password = hash_password(password)
 
-    try:
+    cursor.execute("""
 
-        cursor.execute(
-            "INSERT INTO users (username, password, role) VALUES (?, ?, ?)",
-            (username, hashed_password, role)
-        )
+    INSERT INTO users (
 
-        conn.commit()
+        username,
+        password,
+        role
 
-        return True
+    )
 
-    except:
+    VALUES (?, ?, ?)
 
-        return False
+    """, (
 
-    finally:
+        username,
+        hashed_password,
+        role
 
-        conn.close()
+    ))
 
+    conn.commit()
+
+
+# VALIDATE USER
 
 def validate_user(username, password):
 
-    conn = get_connection()
+    hashed_password = hash_password(password)
 
-    cursor = conn.cursor()
+    cursor.execute("""
 
-    cursor.execute(
-        "SELECT * FROM users WHERE username=?",
-        (username,)
-    )
+    SELECT * FROM users
+
+    WHERE username = ?
+    AND password = ?
+
+    """, (
+
+        username,
+        hashed_password
+
+    ))
 
     user = cursor.fetchone()
 
-    conn.close()
+    return user
 
-    if not user:
-        return False
 
-    stored_password = user["password"]
+# SAVE SCAN HISTORY
 
-    if verify_password(password, stored_password):
-        return user
+def save_scan_history(
+    username,
+    target,
+    total_issues,
+    high,
+    medium,
+    low,
+    info,
+    report_path
+):
 
-    return False
+    cursor.execute("""
+
+    INSERT INTO scan_history (
+
+        username,
+        target,
+        total_issues,
+        high,
+        medium,
+        low,
+        info,
+        report_path
+
+    )
+
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+
+    """, (
+
+        username,
+        target,
+        total_issues,
+        high,
+        medium,
+        low,
+        info,
+        report_path
+
+    ))
+
+    conn.commit()
+
+
+# GET SCAN HISTORY
+
+def get_scan_history():
+
+    cursor.execute("""
+
+    SELECT * FROM scan_history
+
+    ORDER BY created_at DESC
+
+    """)
+
+    scans = cursor.fetchall()
+
+    return scans

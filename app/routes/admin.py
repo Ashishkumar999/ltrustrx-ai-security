@@ -1,36 +1,31 @@
 from fastapi import APIRouter, Request
-from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 
-from modules.logger import write_log
-
+from modules.database import get_scan_history
 
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
 
 
-@router.get("/admin", response_class=HTMLResponse)
+@router.get("/admin")
 async def admin_dashboard(request: Request):
 
     role = request.cookies.get("role")
 
-    username = request.cookies.get("user")
-
-    if role == "admin":
-        write_log("ADMIN_ACCESS", username)
-
     if role != "admin":
 
-        return HTMLResponse(
-            content="""
-            <h1>Access Denied</h1>
-            <p>Admin access only</p>
-            """,
-            status_code=403
+        return templates.TemplateResponse(
+            request=request,
+            name="access_denied.html"
         )
+
+    scans = get_scan_history()
 
     return templates.TemplateResponse(
         request=request,
-        name="admin.html"
+        name="admin.html",
+        context={
+            "scans": scans
+        }
     )
