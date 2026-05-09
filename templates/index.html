@@ -1,8 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>LtrustRx AI Security Scanner</title>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -10,257 +14,355 @@
     <style>
 
         * {
+
             margin: 0;
+
             padding: 0;
+
             box-sizing: border-box;
         }
 
         body {
+
             background: #081028;
+
             font-family: Arial, sans-serif;
+
             color: white;
         }
 
         /* NAVBAR */
 
         .navbar {
+
             width: 100%;
+
             height: 80px;
+
             background: #111c44;
+
             display: flex;
+
             justify-content: space-between;
+
             align-items: center;
+
             padding: 0 40px;
+
             border-bottom: 2px solid #1e3a8a;
         }
 
         .nav-left {
+
             display: flex;
+
             align-items: center;
+
             gap: 20px;
         }
 
         .logo {
+
             font-size: 28px;
+
             font-weight: bold;
+
             color: #38bdf8;
         }
 
         .nav-btn {
+
             background: #0f172a;
+
             border: 1px solid #38bdf8;
+
             color: white;
+
             padding: 10px 18px;
+
             border-radius: 10px;
+
             text-decoration: none;
+
             transition: 0.3s;
         }
 
         .nav-btn:hover {
+
             background: #38bdf8;
+
             color: black;
         }
 
         /* PROFILE */
 
         .profile-container {
+
             position: relative;
         }
 
         .profile-circle {
+
             width: 50px;
+
             height: 50px;
+
+            background: #38bdf8;
+
+            color: black;
+
             border-radius: 50%;
-            background: #38bdf8;
-            color: black;
+
             display: flex;
+
             align-items: center;
+
             justify-content: center;
+
             font-weight: bold;
-            font-size: 22px;
+
+            font-size: 24px;
+
             cursor: pointer;
-            overflow: hidden;
         }
 
-        .profile-circle img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+        .profile-dropdown {
 
-        .dropdown {
             display: none;
+
             position: absolute;
+
             right: 0;
+
             top: 60px;
+
             background: #111c44;
-            width: 220px;
-            border-radius: 15px;
-            padding: 15px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.5);
-            z-index: 999;
-        }
 
-        .dropdown p {
-            margin-bottom: 15px;
-        }
-
-        .dropdown a {
-            display: block;
-            margin-top: 15px;
-            text-decoration: none;
-            background: #38bdf8;
-            color: black;
-            padding: 10px;
             border-radius: 10px;
-            text-align: center;
-            font-weight: bold;
+
+            overflow: hidden;
+
+            min-width: 180px;
+
+            z-index: 999;
+
+            box-shadow: 0 0 10px rgba(0,0,0,0.4);
         }
 
-        .profile-container:hover .dropdown {
+        .profile-dropdown a {
+
             display: block;
+
+            padding: 15px;
+
+            color: white;
+
+            text-decoration: none;
+
+            border-bottom: 1px solid #1e293b;
+        }
+
+        .profile-dropdown a:hover {
+
+            background: #1e293b;
         }
 
         /* MAIN */
 
         .container {
+
             width: 95%;
+
             margin: auto;
+
             padding-top: 30px;
         }
 
         .scan-header {
+
             width: 100%;
+
             background: #111c44;
+
             padding: 30px;
+
             border-radius: 15px;
+
             margin-bottom: 30px;
+
             text-align: center;
         }
 
         .scan-header h1 {
+
             color: #38bdf8;
+
             margin-bottom: 20px;
-            font-size: 42px;
+
+            font-size: 40px;
         }
 
         .scan-btn {
+
             background: #38bdf8;
+
             color: black;
+
             padding: 15px 30px;
+
             border-radius: 12px;
-            text-decoration: none;
+
+            border: none;
+
             font-weight: bold;
-            display: inline-block;
+
+            cursor: pointer;
+        }
+
+        .target-input {
+
+            width: 400px;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            border: none;
+
+            margin-right: 10px;
+        }
+
+        /* SCORE CARDS */
+
+        .score-container {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 30px;
+
+            margin-top: 20px;
+
+            margin-bottom: 30px;
+
+            flex-wrap: wrap;
+        }
+
+        .score-card {
+
+            background: #111c44;
+
+            padding: 20px;
+
+            border-radius: 15px;
+
+            width: 300px;
+
+            text-align: center;
+
+            border: 2px solid #38bdf8;
+        }
+
+        .score-card h2 {
+
+            color: #38bdf8;
+
+            margin-bottom: 15px;
+        }
+
+        .score-card h1 {
+
+            font-size: 48px;
         }
 
         /* DASHBOARD */
 
         .dashboard {
+
             display: flex;
+
             gap: 20px;
         }
 
         .left-panel {
+
             flex: 3;
+
             display: grid;
+
             grid-template-columns: repeat(3, 1fr);
+
             gap: 20px;
         }
 
         .card {
+
             background: #111c44;
+
             border-left: 5px solid #38bdf8;
+
             border-radius: 15px;
+
             padding: 20px;
-            min-height: 260px;
+
+            min-height: 250px;
         }
 
         .card h2 {
+
             margin-bottom: 15px;
+
             font-size: 22px;
         }
 
         .card p {
+
             margin-bottom: 12px;
+
             line-height: 1.5;
         }
 
         .severity {
-            color: #38bdf8;
-            font-weight: bold;
-        }
 
-        .pdf-btn {
-            display: inline-block;
-            margin-top: 15px;
-            background: #38bdf8;
-            color: black;
-            padding: 12px 20px;
-            border-radius: 10px;
-            text-decoration: none;
+            color: #38bdf8;
+
             font-weight: bold;
         }
 
         /* RIGHT PANEL */
 
         .right-panel {
+
             flex: 1;
+
             background: #111c44;
+
             border-radius: 15px;
+
             padding: 20px;
+
             height: fit-content;
         }
 
         .right-panel h2 {
+
             text-align: center;
+
             margin-bottom: 20px;
         }
 
         .chart-container {
+
             width: 100%;
+
             max-width: 300px;
+
             margin: auto;
         }
 
-        .legend {
-            margin-top: 30px;
-        }
-
-        .legend-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 15px;
-        }
-
-        .legend-color {
-            width: 20px;
-            height: 20px;
-            border-radius: 5px;
-            margin-right: 10px;
-        }
-
-        .critical {
-            background: #dc2626;
-        }
-
-        .high {
-            background: #ef4444;
-        }
-
-        .medium {
-            background: #f59e0b;
-        }
-
-        .low {
-            background: #22c55e;
-        }
-
-        .info {
-            background: #38bdf8;
-        }
-
     </style>
+
 </head>
 
 <body>
@@ -275,11 +377,9 @@
                 LtrustRx 🚀
             </div>
 
-            <a href="/admin" class="nav-btn">Admin</a>
-
-            <a href="/scan/ui" class="nav-btn">Scan/UI</a>
-
-            <a href="/docs" class="nav-btn">Docs</a>
+            <a href="/admin" class="nav-btn">
+                Admin
+            </a>
 
         </div>
 
@@ -287,19 +387,21 @@
 
         <div class="profile-container">
 
-            <div class="profile-circle" id="profileCircle">
+            <div class="profile-circle" onclick="toggleProfileMenu()">
+
                 A
+
             </div>
 
-            <div class="dropdown">
+            <div id="profileDropdown" class="profile-dropdown">
 
-                <p>
-                    <strong>User:</strong> Admin
-                </p>
+                <a href="#">
+                    Edit Profile
+                </a>
 
-                <input type="file" id="imageUpload">
-
-                <a href="/logout">Logout</a>
+                <a href="/logout">
+                    Logout
+                </a>
 
             </div>
 
@@ -315,95 +417,63 @@
 
             <h1>AI Security Scan Report</h1>
 
-             {% if results %}
+            <form action="/scan/ui" method="post">
 
-<div style="
-    display:flex;
-    justify-content:center;
-    gap:30px;
-    margin-top:20px;
-    margin-bottom:30px;
-    flex-wrap:wrap;
-">
+                <input
+                    type="text"
+                    name="target"
+                    class="target-input"
+                    placeholder="Enter Healthcare AI Target"
+                    required
+                >
 
-    <div style="
-        background:#111c44;
-        padding:20px;
-        border-radius:15px;
-        width:300px;
-        text-align:center;
-        border:2px solid #38bdf8;
-    ">
+                <button class="scan-btn" type="submit">
 
-        <h2 style="color:#38bdf8;">
-            Overall Security Score
-        </h2>
+                    Run LLM Security Scan
 
-        <h1 style="
-            font-size:48px;
-            color:white;
-        ">
-            {{ results.summary.security_score }}/100
-        </h1>
+                </button>
 
-    </div>
-
-
-    <div style="
-        background:#111c44;
-        padding:20px;
-        border-radius:15px;
-        width:300px;
-        text-align:center;
-        border:2px solid #38bdf8;
-    ">
-
-        <h2 style="color:#38bdf8;">
-            Healthcare AI Risk Level
-        </h2>
-
-        <h1 style="
-            font-size:42px;
-            color:#f59e0b;
-        ">
-            {{ results.summary.risk_level }}
-        </h1>
-
-    </div>
-
-</div>
-
-                  {% endif %}
-
-           <form action="/scan/ui" method="post">
-
-                 <input
-                 type="text"
-                 name="target"
-                 placeholder="Enter Healthcare AI Target"
-                 required
-                 style="
-                   width: 400px;
-                   padding: 15px;
-                   border-radius: 10px;
-                   border: none;
-                   margin-right: 10px;
-                   "
-                  >
-
-        <button class="scan-btn" type="submit">
-            Run LLM Security Scan
-        </button>
-
-     </form>
+            </form>
 
         </div>
 
         {% if results %}
 
+        <!-- SCORE -->
+
+        <div class="score-container">
+
+            <div class="score-card">
+
+                <h2>Overall Security Score</h2>
+
+                <h1>
+
+                    {{ results.summary.security_score }}/100
+
+                </h1>
+
+            </div>
+
+            <div class="score-card">
+
+                <h2>Healthcare AI Risk Level</h2>
+
+                <h1 style="color:#f59e0b;">
+
+                    {{ results.summary.risk_level }}
+
+                </h1>
+
+            </div>
+
+        </div>
+
+        <!-- DASHBOARD -->
+
         <div class="dashboard">
 
-            <!-- LEFT PANEL -->
+            <!-- LEFT -->
 
             <div class="left-panel">
 
@@ -414,25 +484,40 @@
                     <h2>{{ issue.issue }}</h2>
 
                     <p>
-                        <span class="severity">Severity:</span>
+
+                        <span class="severity">
+
+                            Severity:
+
+                        </span>
+
                         {{ issue.severity }}
+
                     </p>
 
-                    <p><strong>Payload:</strong></p>
+                    <p>
 
-                    <p>{{ issue.payload }}</p>
+                        <strong>Payload:</strong>
 
-                    <p><strong>Recommendation:</strong></p>
+                    </p>
 
-                    <p>{{ issue.recommendation }}</p>
+                    <p>
 
-                    {% if results.pdf_report %}
+                        {{ issue.payload }}
 
-                    <a href="/{{ results.pdf_report }}" class="pdf-btn">
-                        Download PDF
-                    </a>
+                    </p>
 
-                    {% endif %}
+                    <p>
+
+                        <strong>Recommendation:</strong>
+
+                    </p>
+
+                    <p>
+
+                        {{ issue.recommendation }}
+
+                    </p>
 
                 </div>
 
@@ -440,42 +525,15 @@
 
             </div>
 
-            <!-- RIGHT PANEL -->
+            <!-- RIGHT -->
 
             <div class="right-panel">
 
                 <h2>Severity Analytics</h2>
 
                 <div class="chart-container">
+
                     <canvas id="severityChart"></canvas>
-                </div>
-
-                <div class="legend">
-
-                    <div class="legend-item">
-                        <div class="legend-color critical"></div>
-                        Critical
-                    </div>
-
-                    <div class="legend-item">
-                        <div class="legend-color high"></div>
-                        High
-                    </div>
-
-                    <div class="legend-item">
-                        <div class="legend-color medium"></div>
-                        Medium
-                    </div>
-
-                    <div class="legend-item">
-                        <div class="legend-color low"></div>
-                        Low
-                    </div>
-
-                    <div class="legend-item">
-                        <div class="legend-color info"></div>
-                        Info
-                    </div>
 
                 </div>
 
@@ -499,24 +557,32 @@
 
             data: {
 
-                labels: ['Critical', 'High', 'Medium', 'Low', 'Info'],
+                labels: ['High', 'Medium', 'Low', 'Info'],
 
                 datasets: [{
 
                     data: [
-                        {{ results.summary.get('critical', 0) }},
-                        {{ results.summary.get('high', 0) }},
-                        {{ results.summary.get('medium', 0) }},
-                        {{ results.summary.get('low', 0) }},
-                        {{ results.summary.get('info', 0) }}
+
+                        {{ results.summary.high }},
+
+                        {{ results.summary.medium }},
+
+                        {{ results.summary.low }},
+
+                        {{ results.summary.info }}
+
                     ],
 
                     backgroundColor: [
-                        '#dc2626',
+
                         '#ef4444',
+
                         '#f59e0b',
+
                         '#22c55e',
+
                         '#38bdf8'
+
                     ]
 
                 }]
@@ -528,32 +594,39 @@
 
     {% endif %}
 
-    <!-- PROFILE IMAGE -->
+    <!-- PROFILE MENU -->
 
     <script>
 
-        const imageUpload = document.getElementById('imageUpload');
+        function toggleProfileMenu() {
 
-        const profileCircle = document.getElementById('profileCircle');
+            const menu = document.getElementById("profileDropdown");
 
-        imageUpload.addEventListener('change', function(event) {
+            if (menu.style.display === "block") {
 
-            const file = event.target.files[0];
+                menu.style.display = "none";
 
-            if (file) {
+            } else {
 
-                const reader = new FileReader();
-
-                reader.onload = function(e) {
-
-                    profileCircle.innerHTML =
-                        `<img src="${e.target.result}" alt="Profile">`;
-
-                };
-
-                reader.readAsDataURL(file);
+                menu.style.display = "block";
             }
-        });
+        }
+
+
+        // CLOSE MENU WHEN CLICKING OUTSIDE
+
+        window.onclick = function(event) {
+
+            if (!event.target.matches('.profile-circle')) {
+
+                const dropdown = document.getElementById("profileDropdown");
+
+                if (dropdown.style.display === "block") {
+
+                    dropdown.style.display = "none";
+                }
+            }
+        }
 
     </script>
 
@@ -564,12 +637,16 @@
         let idleTime = 0;
 
         function resetTimer() {
+
             idleTime = 0;
         }
 
         document.onmousemove = resetTimer;
+
         document.onkeypress = resetTimer;
+
         document.onclick = resetTimer;
+
         document.onscroll = resetTimer;
 
         setInterval(function () {
@@ -578,9 +655,9 @@
 
             if (idleTime >= 5) {
 
-                alert('Session expired due to inactivity');
+                alert("Session expired due to inactivity");
 
-                window.location.href = '/logout';
+                window.location.href = "/logout";
             }
 
         }, 60000);
@@ -588,4 +665,5 @@
     </script>
 
 </body>
+
 </html>
