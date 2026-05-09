@@ -12,54 +12,40 @@
         body {
 
             background: #081028;
-
             color: white;
-
             font-family: Arial;
-
             padding: 40px;
         }
 
         h1 {
 
             color: #38bdf8;
-
             margin-bottom: 30px;
         }
 
         table {
 
             width: 100%;
-
             border-collapse: collapse;
-
             background: #111c44;
         }
 
         th, td {
 
             padding: 15px;
-
             border: 1px solid #1e3a8a;
-
             text-align: center;
         }
 
         th {
 
             background: #38bdf8;
-
             color: black;
         }
 
         tr:hover {
 
             background: #1e293b;
-        }
-
-        a {
-
-            color: #38bdf8;
         }
 
     </style>
@@ -75,21 +61,12 @@
         <tr>
 
             <th>User</th>
-
             <th>Target</th>
-
             <th>Total</th>
-
             <th>High</th>
-
             <th>Medium</th>
-
             <th>Low</th>
-
             <th>Info</th>
-
-            <th>Report</th>
-
             <th>Date</th>
 
         </tr>
@@ -99,27 +76,12 @@
         <tr>
 
             <td>{{ scan.username }}</td>
-
             <td>{{ scan.target }}</td>
-
             <td>{{ scan.total_issues }}</td>
-
             <td>{{ scan.high }}</td>
-
             <td>{{ scan.medium }}</td>
-
             <td>{{ scan.low }}</td>
-
             <td>{{ scan.info }}</td>
-
-            <td>
-
-                <a href="/{{ scan.report_path }}">
-                    PDF
-                </a>
-
-            </td>
-
             <td>{{ scan.created_at }}</td>
 
         </tr>

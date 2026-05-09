@@ -315,9 +315,27 @@
 
             <h1>AI Security Scan Report</h1>
 
-            <a href="/scan/ui" class="scan-btn">
-                Run LLM Security Scan
-            </a>
+           <form action="/scan/ui" method="post">
+
+                 <input
+                 type="text"
+                 name="target"
+                 placeholder="Enter Healthcare AI Target"
+                 required
+                 style="
+                   width: 400px;
+                   padding: 15px;
+                   border-radius: 10px;
+                   border: none;
+                   margin-right: 10px;
+                   "
+                  >
+
+        <button class="scan-btn" type="submit">
+            Run LLM Security Scan
+        </button>
+
+     </form>
 
         </div>
 
