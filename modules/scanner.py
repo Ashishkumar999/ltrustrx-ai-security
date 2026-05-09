@@ -155,8 +155,6 @@ def run_healthcare_scan(target):
     info = 0
 
 
-    # HTTP SECURITY TESTS
-
     try:
 
         response = requests.get(
@@ -168,6 +166,8 @@ def run_healthcare_scan(target):
         )
 
         headers = response.headers
+
+        body = response.text
 
 
         required_headers = [
@@ -198,6 +198,46 @@ def run_healthcare_scan(target):
                 })
 
                 medium += 1
+
+
+        # SECRET LEAKAGE DETECTION
+
+        secret_patterns = [
+
+            "sk-",
+
+            "AWS_SECRET_ACCESS_KEY",
+
+            "AIza",
+
+            "Bearer ",
+
+            "api_key",
+
+            "secret_key",
+
+            "password="
+
+        ]
+
+
+        for secret in secret_patterns:
+
+            if secret.lower() in body.lower():
+
+                issues.append({
+
+                    "issue": "Potential Secret Leakage",
+
+                    "severity": "High",
+
+                    "payload": secret,
+
+                    "recommendation": "Remove exposed secrets immediately"
+
+                })
+
+                high += 1
 
 
         if "Server" in headers:
@@ -262,7 +302,7 @@ def run_healthcare_scan(target):
             info += 1
 
 
-    # RISK SCORE
+    # RISK SCORING
 
     risk_points = (
 
