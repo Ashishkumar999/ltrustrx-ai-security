@@ -1,8 +1,13 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from fastapi import Request
+from fastapi import Form
+
 from fastapi.templating import Jinja2Templates
 
 from modules.scanner import run_healthcare_scan
 from modules.database import save_scan_history
+
+from datetime import datetime
 
 
 router = APIRouter()
@@ -10,38 +15,121 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
+# RATE LIMIT STORE
+
+RATE_LIMIT_TRACKER = {}
+
+
 @router.post("/scan/ui")
-async def scan_ui(request: Request):
+async def ui_scan(
 
-    form = await request.form()
+    request: Request,
 
-    target = form.get("target")
+    target: str = Form(...)
 
-    username = request.cookies.get("user", "anonymous")
+):
+
+    user = request.cookies.get("user")
+
+
+    # CHECK LOGIN
+
+    if not user:
+
+        return templates.TemplateResponse(
+
+            request=request,
+
+            name="login.html",
+
+            context={
+
+                "error": "Please login first"
+
+            }
+
+        )
+
+
+    # RATE LIMITING
+
+    current_time = datetime.now().timestamp()
+
+
+    if user not in RATE_LIMIT_TRACKER:
+
+        RATE_LIMIT_TRACKER[user] = []
+
+
+    # KEEP ONLY LAST 60 SECONDS
+
+    RATE_LIMIT_TRACKER[user] = [
+
+        t for t in RATE_LIMIT_TRACKER[user]
+
+        if current_time - t < 60
+
+    ]
+
+
+    # MAX 5 REQUESTS
+
+    if len(RATE_LIMIT_TRACKER[user]) >= 5:
+
+        return templates.TemplateResponse(
+
+            request=request,
+
+            name="index.html",
+
+            context={
+
+                "error":
+
+                "Too many scan requests. Please wait."
+
+            }
+
+        )
+
+
+    RATE_LIMIT_TRACKER[user].append(
+
+        current_time
+
+    )
+
+
+    # RUN SCANNER
 
     results = run_healthcare_scan(target)
 
-    summary = results.get("summary", {})
+
+    summary = results["summary"]
+
+
+    # SAVE TO DATABASE
 
     save_scan_history(
 
-        username=username,
+        username=user,
 
         target=target,
 
-        total_issues=summary.get("total", 0),
+        total=summary["total"],
 
-        high=summary.get("high", 0),
+        high=summary["high"],
 
-        medium=summary.get("medium", 0),
+        medium=summary["medium"],
 
-        low=summary.get("low", 0),
+        low=summary["low"],
 
-        info=summary.get("info", 0),
-
-        report_path=results.get("pdf_report", "")
+        info=summary["info"]
 
     )
+
+
+    # RETURN PAGE
 
     return templates.TemplateResponse(
 

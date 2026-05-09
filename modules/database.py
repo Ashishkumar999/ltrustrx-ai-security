@@ -1,12 +1,17 @@
 import sqlite3
-import hashlib
+
+from passlib.hash import bcrypt
 
 
 # DATABASE CONNECTION
 
-conn = sqlite3.connect("ltrust.db", check_same_thread=False)
+conn = sqlite3.connect(
 
-conn.row_factory = sqlite3.Row
+    "ltrust.db",
+
+    check_same_thread=False
+
+)
 
 cursor = conn.cursor()
 
@@ -21,15 +26,11 @@ CREATE TABLE IF NOT EXISTS users (
 
     username TEXT UNIQUE,
 
-    password TEXT,
-
-    role TEXT DEFAULT 'user'
+    password TEXT
 
 )
 
 """)
-
-conn.commit()
 
 
 # SCAN HISTORY TABLE
@@ -44,7 +45,7 @@ CREATE TABLE IF NOT EXISTS scan_history (
 
     target TEXT,
 
-    total_issues INTEGER,
+    total INTEGER,
 
     high INTEGER,
 
@@ -54,120 +55,178 @@ CREATE TABLE IF NOT EXISTS scan_history (
 
     info INTEGER,
 
-    report_path TEXT,
-
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 )
 
 """)
 
+
 conn.commit()
-
-
-# HASH PASSWORD
-
-def hash_password(password):
-
-    return hashlib.sha256(password.encode()).hexdigest()
 
 
 # CREATE USER
 
-def create_user(username, password, role="user"):
+def create_user(
 
-    hashed_password = hash_password(password)
+    username,
 
-    cursor.execute("""
+    password
 
-    INSERT INTO users (
+):
 
-        username,
-        password,
-        role
+    hashed_password = bcrypt.hash(password)
 
-    )
 
-    VALUES (?, ?, ?)
+    try:
 
-    """, (
+        cursor.execute(
 
-        username,
-        hashed_password,
-        role
+            """
 
-    ))
+            INSERT INTO users (
 
-    conn.commit()
+                username,
+
+                password
+
+            )
+
+            VALUES (?, ?)
+
+            """,
+
+            (
+
+                username,
+
+                hashed_password
+
+            )
+
+        )
+
+
+        conn.commit()
+
+        return True
+
+
+    except:
+
+        return False
 
 
 # VALIDATE USER
 
-def validate_user(username, password):
+def validate_user(
 
-    hashed_password = hash_password(password)
+    username,
 
-    cursor.execute("""
+    password
 
-    SELECT * FROM users
+):
 
-    WHERE username = ?
-    AND password = ?
+    cursor.execute(
 
-    """, (
+        """
 
-        username,
-        hashed_password
+        SELECT password
 
-    ))
+        FROM users
+
+        WHERE username=?
+
+        """,
+
+        (username,)
+
+    )
+
 
     user = cursor.fetchone()
 
-    return user
+
+    if not user:
+
+        return False
+
+
+    return bcrypt.verify(
+
+        password,
+
+        user[0]
+
+    )
 
 
 # SAVE SCAN HISTORY
 
 def save_scan_history(
+
     username,
+
     target,
-    total_issues,
+
+    total,
+
     high,
+
     medium,
+
     low,
-    info,
-    report_path
+
+    info
+
 ):
 
-    cursor.execute("""
+    cursor.execute(
 
-    INSERT INTO scan_history (
+        """
 
-        username,
-        target,
-        total_issues,
-        high,
-        medium,
-        low,
-        info,
-        report_path
+        INSERT INTO scan_history (
+
+            username,
+
+            target,
+
+            total,
+
+            high,
+
+            medium,
+
+            low,
+
+            info
+
+        )
+
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+
+        """,
+
+        (
+
+            username,
+
+            target,
+
+            total,
+
+            high,
+
+            medium,
+
+            low,
+
+            info
+
+        )
 
     )
 
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-
-    """, (
-
-        username,
-        target,
-        total_issues,
-        high,
-        medium,
-        low,
-        info,
-        report_path
-
-    ))
 
     conn.commit()
 
@@ -176,14 +235,35 @@ def save_scan_history(
 
 def get_scan_history():
 
-    cursor.execute("""
+    cursor.execute(
 
-    SELECT * FROM scan_history
+        """
 
-    ORDER BY created_at DESC
+        SELECT
 
-    """)
+            username,
 
-    scans = cursor.fetchall()
+            target,
 
-    return scans
+            total,
+
+            high,
+
+            medium,
+
+            low,
+
+            info,
+
+            created_at
+
+        FROM scan_history
+
+        ORDER BY id DESC
+
+        """
+
+    )
+
+
+    return cursor.fetchall()

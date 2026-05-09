@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 from fastapi import Form
 from fastapi import Request
+
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -58,19 +59,11 @@ async def signup(
 
 ):
 
-    role = "user"
-
-    if username == "admin":
-
-        role = "admin"
-
     create_user(
 
         username=username,
 
-        password=password,
-
-        role=role
+        password=password
 
     )
 
@@ -94,7 +87,7 @@ async def login(
 
 ):
 
-    user = validate_user(
+    valid = validate_user(
 
         username,
 
@@ -102,7 +95,8 @@ async def login(
 
     )
 
-    if not user:
+
+    if not valid:
 
         return RedirectResponse(
 
@@ -139,29 +133,12 @@ async def login(
 
         value=username,
 
-        httponly=True,
-
-        secure=False
+        httponly=True
 
     )
 
 
-    # ROLE COOKIE
-
-    response.set_cookie(
-
-        key="role",
-
-        value=user["role"],
-
-        httponly=True,
-
-        secure=False
-
-    )
-
-
-    # JWT TOKEN COOKIE
+    # JWT COOKIE
 
     response.set_cookie(
 
@@ -169,11 +146,10 @@ async def login(
 
         value=token,
 
-        httponly=True,
-
-        secure=False
+        httponly=True
 
     )
+
 
     return response
 
@@ -192,8 +168,6 @@ async def logout():
     )
 
     response.delete_cookie("user")
-
-    response.delete_cookie("role")
 
     response.delete_cookie("access_token")
 
