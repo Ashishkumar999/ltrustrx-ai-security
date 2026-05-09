@@ -1,141 +1,200 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from fastapi import Form
+from fastapi import Request
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
-from modules.database import (
-    create_user,
-    validate_user
-)
+from modules.database import create_user
+from modules.database import validate_user
 
-from modules.logger import write_log
+from modules.jwt_handler import create_access_token
 
-from modules.security import (
-    is_blocked,
-    record_failed_attempt,
-    reset_attempts
-)
 
 router = APIRouter()
 
 templates = Jinja2Templates(directory="templates")
 
 
+# LOGIN PAGE
+
 @router.get("/login")
 async def login_page(request: Request):
 
     return templates.TemplateResponse(
+
         request=request,
-        name="login.html"
-    )
 
-
-@router.post("/login")
-async def login_post(request: Request):
-
-    form = await request.form()
-
-    username = form.get("username")
-
-    password = form.get("password")
-
-    # RATE LIMIT CHECK
-
-    if is_blocked(username):
-
-        return templates.TemplateResponse(
-            request=request,
-            name="login.html",
-            context={
-                "error": "Too many failed attempts. Try again later."
-            }
-        )
-
-    user = validate_user(username, password)
-
-    if user:
-
-        reset_attempts(username)
-
-        write_log("LOGIN_SUCCESS", username)
-
-        response = RedirectResponse(
-            url="/",
-            status_code=303
-        )
-
-        # SECURE COOKIES
-
-        response.set_cookie(
-            key="user",
-            value=username,
-            httponly=True,
-            secure=False,
-            samesite="Strict"
-        )
-
-        response.set_cookie(
-            key="role",
-            value=user["role"],
-            httponly=True,
-            secure=False,
-            samesite="Strict"
-        )
-
-        return response
-
-    # FAILED LOGIN
-
-    record_failed_attempt(username)
-
-    write_log("LOGIN_FAILED", username)
-
-    return templates.TemplateResponse(
-        request=request,
         name="login.html",
-        context={
-            "error": "Invalid username or password"
-        }
+
+        context={}
+
     )
 
+
+# SIGNUP PAGE
 
 @router.get("/signup")
 async def signup_page(request: Request):
 
     return templates.TemplateResponse(
+
         request=request,
-        name="signup.html"
+
+        name="signup.html",
+
+        context={}
+
     )
 
+
+# SIGNUP
 
 @router.post("/signup")
-async def signup_post(request: Request):
+async def signup(
 
-    form = await request.form()
+    username: str = Form(...),
 
-    username = form.get("username")
+    password: str = Form(...)
 
-    password = form.get("password")
+):
 
-    create_user(username, password)
+    role = "user"
 
-    write_log("SIGNUP", username)
+    if username == "admin":
 
-    return RedirectResponse(
-        url="/login",
-        status_code=303
+        role = "admin"
+
+    create_user(
+
+        username=username,
+
+        password=password,
+
+        role=role
+
     )
 
+    return RedirectResponse(
+
+        url="/login",
+
+        status_code=303
+
+    )
+
+
+# LOGIN
+
+@router.post("/login")
+async def login(
+
+    username: str = Form(...),
+
+    password: str = Form(...)
+
+):
+
+    user = validate_user(
+
+        username,
+
+        password
+
+    )
+
+    if not user:
+
+        return RedirectResponse(
+
+            url="/login",
+
+            status_code=303
+
+        )
+
+
+    # CREATE JWT TOKEN
+
+    token = create_access_token({
+
+        "sub": username
+
+    })
+
+
+    response = RedirectResponse(
+
+        url="/",
+
+        status_code=303
+
+    )
+
+
+    # USER COOKIE
+
+    response.set_cookie(
+
+        key="user",
+
+        value=username,
+
+        httponly=True,
+
+        secure=False
+
+    )
+
+
+    # ROLE COOKIE
+
+    response.set_cookie(
+
+        key="role",
+
+        value=user["role"],
+
+        httponly=True,
+
+        secure=False
+
+    )
+
+
+    # JWT TOKEN COOKIE
+
+    response.set_cookie(
+
+        key="access_token",
+
+        value=token,
+
+        httponly=True,
+
+        secure=False
+
+    )
+
+    return response
+
+
+# LOGOUT
 
 @router.get("/logout")
 async def logout():
 
     response = RedirectResponse(
+
         url="/login",
+
         status_code=303
+
     )
 
     response.delete_cookie("user")
 
     response.delete_cookie("role")
+
+    response.delete_cookie("access_token")
 
     return response
