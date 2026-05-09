@@ -1,51 +1,76 @@
 <!DOCTYPE html>
-<html lang="en">
+
+<html>
 
 <head>
 
-    <meta charset="UTF-8">
-
-    <title>Admin Dashboard</title>
+    <title>LtrustRx Admin</title>
 
     <style>
 
         body {
 
-            background: #081028;
+            margin: 0;
+
+            padding: 30px;
+
+            background: #020c2b;
+
             color: white;
+
             font-family: Arial;
-            padding: 40px;
+
         }
+
 
         h1 {
 
             color: #38bdf8;
-            margin-bottom: 30px;
+
+            margin-bottom: 40px;
+
         }
+
 
         table {
 
             width: 100%;
+
             border-collapse: collapse;
-            background: #111c44;
+
+            background: #132257;
+
         }
 
-        th, td {
-
-            padding: 15px;
-            border: 1px solid #1e3a8a;
-            text-align: center;
-        }
 
         th {
 
             background: #38bdf8;
+
             color: black;
+
+            padding: 18px;
+
+            border: 1px solid #1d4ed8;
+
         }
+
+
+        td {
+
+            padding: 16px;
+
+            border: 1px solid #1d4ed8;
+
+            text-align: center;
+
+        }
+
 
         tr:hover {
 
-            background: #1e293b;
+            background: #1e3a8a;
+
         }
 
     </style>
@@ -54,39 +79,67 @@
 
 <body>
 
-    <h1>Admin Scan History Dashboard 🚀</h1>
+    <h1>
+
+        Admin Scan History Dashboard 🚀
+
+    </h1>
+
 
     <table>
 
-        <tr>
+        <thead>
 
-            <th>User</th>
-            <th>Target</th>
-            <th>Total</th>
-            <th>High</th>
-            <th>Medium</th>
-            <th>Low</th>
-            <th>Info</th>
-            <th>Date</th>
+            <tr>
 
-        </tr>
+                <th>User</th>
 
-        {% for scan in scans %}
+                <th>Target</th>
 
-        <tr>
+                <th>Total</th>
 
-            <td>{{ scan.username }}</td>
-            <td>{{ scan.target }}</td>
-            <td>{{ scan.total_issues }}</td>
-            <td>{{ scan.high }}</td>
-            <td>{{ scan.medium }}</td>
-            <td>{{ scan.low }}</td>
-            <td>{{ scan.info }}</td>
-            <td>{{ scan.created_at }}</td>
+                <th>High</th>
 
-        </tr>
+                <th>Medium</th>
 
-        {% endfor %}
+                <th>Low</th>
+
+                <th>Info</th>
+
+                <th>Date</th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+            {% for row in history %}
+
+            <tr>
+
+                <td>{{ row[0] }}</td>
+
+                <td>{{ row[1] }}</td>
+
+                <td>{{ row[2] }}</td>
+
+                <td>{{ row[3] }}</td>
+
+                <td>{{ row[4] }}</td>
+
+                <td>{{ row[5] }}</td>
+
+                <td>{{ row[6] }}</td>
+
+                <td>{{ row[7] }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
 
     </table>
 

@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from fastapi import Request
+
 from fastapi.templating import Jinja2Templates
 
 from modules.database import get_scan_history
@@ -12,7 +14,8 @@ templates = Jinja2Templates(directory="templates")
 @router.get("/admin")
 async def admin_dashboard(request: Request):
 
-    scans = get_scan_history()
+    history = get_scan_history()
+
 
     return templates.TemplateResponse(
 
@@ -22,7 +25,7 @@ async def admin_dashboard(request: Request):
 
         context={
 
-            "scans": scans
+            "history": history
 
         }
 
