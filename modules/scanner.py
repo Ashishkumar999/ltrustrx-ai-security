@@ -239,6 +239,45 @@ def run_healthcare_scan(target):
 
                 high += 1
 
+        # AI MODEL ENUMERATION
+
+        model_patterns = [
+
+            "gpt-4",
+
+            "gpt-3.5",
+
+            "claude",
+
+            "gemini",
+
+            "llama",
+
+            "mistral",
+
+            "azure openai"
+
+        ]
+
+
+        for model in model_patterns:
+
+            if model.lower() in body.lower():
+
+                issues.append({
+
+                    "issue": "AI Model Fingerprinting Exposure",
+
+                    "severity": "Medium",
+
+                    "payload": model,
+
+                    "recommendation": "Hide backend AI model details"
+
+                })
+
+                medium += 1
+
 
         if "Server" in headers:
 
