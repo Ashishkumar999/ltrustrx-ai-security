@@ -14,8 +14,6 @@ def run_healthcare_scan(target):
     info = 0
 
 
-    # CHECK SECURITY HEADERS
-
     try:
 
         response = requests.get(target, timeout=5)
@@ -53,8 +51,6 @@ def run_healthcare_scan(target):
                 medium += 1
 
 
-        # CHECK SERVER DISCLOSURE
-
         if "Server" in headers:
 
             issues.append({
@@ -71,8 +67,6 @@ def run_healthcare_scan(target):
 
             low += 1
 
-
-        # CHECK ADMIN PANEL
 
         admin_paths = [
 
@@ -131,6 +125,40 @@ def run_healthcare_scan(target):
         info += 1
 
 
+    # RISK SCORING
+
+    risk_points = (
+
+        (high * 15) +
+
+        (medium * 8) +
+
+        (low * 3) +
+
+        (info * 1)
+
+    )
+
+
+    security_score = max(0, 100 - risk_points)
+
+
+    risk_level = "LOW"
+
+
+    if security_score < 40:
+
+        risk_level = "CRITICAL"
+
+    elif security_score < 60:
+
+        risk_level = "HIGH"
+
+    elif security_score < 80:
+
+        risk_level = "MEDIUM"
+
+
     summary = {
 
         "total": len(issues),
@@ -141,7 +169,11 @@ def run_healthcare_scan(target):
 
         "low": low,
 
-        "info": info
+        "info": info,
+
+        "security_score": security_score,
+
+        "risk_level": risk_level
 
     }
 
