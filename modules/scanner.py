@@ -67,6 +67,20 @@ PROMPT_INJECTION_PAYLOADS = [
 
     "<body onload=alert('XSS')>"
 
+    "http://169.254.169.254",
+
+    "http://localhost:8080",
+
+    "http://127.0.0.1/admin",
+
+    "http://internal-api/admin",
+
+    "file:///etc/passwd",
+
+    "http://metadata.google.internal",
+
+    "http://aws-metadata/"
+
 ]
 
 
@@ -328,6 +342,70 @@ def analyze_prompt_payload(payload):
         issue = "Automatic Script Execution Risk"
 
         recommendation = "Sanitize HTML event handlers"
+
+
+    elif "169.254.169.254" in payload.lower():
+
+        severity = "Critical"
+
+        issue = "Cloud Metadata SSRF Attempt"
+
+        recommendation = "Block cloud metadata access"
+
+
+    elif "localhost" in payload.lower():
+
+        severity = "High"
+
+        issue = "Localhost SSRF Attempt"
+
+        recommendation = "Restrict localhost requests"
+
+
+    elif "127.0.0.1" in payload.lower():
+
+        severity = "High"
+
+        issue = "Loopback Address Access Attempt"
+
+        recommendation = "Block internal loopback access"
+
+
+    elif "internal-api" in payload.lower():
+
+        severity = "Critical"
+
+        issue = "Internal API SSRF Attempt"
+
+        recommendation = "Protect internal APIs"
+
+
+    elif "file:///" in payload.lower():
+
+        severity = "Critical"
+
+        issue = "Local File Access Attempt"
+
+        recommendation = "Restrict local file retrieval"
+
+
+    elif "metadata.google.internal" in payload.lower():
+
+        severity = "Critical"
+
+        issue = "GCP Metadata SSRF Attempt"
+
+        recommendation = "Block cloud metadata endpoints"
+
+
+    elif "aws-metadata" in payload.lower():
+
+        severity = "Critical"
+
+        issue = "AWS Metadata Access Attempt"
+
+        recommendation = "Restrict AWS metadata access"
+
 
     return {
 
