@@ -1048,6 +1048,8 @@ def run_healthcare_scan(target):
 
     issues = []
 
+    critical = 0
+
     high = 0
 
     medium = 0
@@ -1227,7 +1229,7 @@ def run_healthcare_scan(target):
 
         if severity == "Critical":
 
-            high += 2
+            critical += 1
 
         if severity == "High":
 
@@ -1286,22 +1288,34 @@ def run_healthcare_scan(target):
         risk_level = "MEDIUM"
 
 
+    risk_score = (
+        critical * 25 +
+        high * 15 +
+        medium * 8 +
+        low * 3
+    )
+
+    if risk_score >= 80:
+        posture = "Critical Risk"
+
+    elif risk_score >= 50:
+        posture = "High Risk"
+
+    elif risk_score >= 25:
+        posture = "Medium Risk"
+
+    else:
+        posture = "Low Risk"
+
     summary = {
-
         "total": len(issues),
-
+        "critical": critical,
         "high": high,
-
         "medium": medium,
-
         "low": low,
-
         "info": info,
-
-        "security_score": security_score,
-
-        "risk_level": risk_level
-
+        "risk_score": risk_score,
+        "posture": posture
     }
 
 

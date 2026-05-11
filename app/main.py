@@ -16,6 +16,16 @@ from app.routes.admin import router as admin_router
 
 app = FastAPI()
 
+app.mount(
+
+    "/reports",
+
+    StaticFiles(directory="reports"),
+
+    name="reports"
+
+)
+
 templates = Jinja2Templates(directory="templates")
 
 

@@ -7,6 +7,8 @@ from fastapi.templating import Jinja2Templates
 from modules.scanner import run_healthcare_scan
 from modules.database import save_scan_history
 
+from modules.report_generator import generate_pdf_report
+
 from datetime import datetime
 
 
@@ -129,6 +131,11 @@ async def ui_scan(
     )
 
 
+    # GENERATE PDF REPORT
+
+    report_file = generate_pdf_report(results)
+
+
     # RETURN PAGE
 
     return templates.TemplateResponse(
@@ -139,7 +146,9 @@ async def ui_scan(
 
         context={
 
-            "results": results
+            "results": results,
+
+            "report_file": report_file
 
         }
 
