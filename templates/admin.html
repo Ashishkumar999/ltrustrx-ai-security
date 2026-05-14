@@ -1,147 +1,500 @@
 <!DOCTYPE html>
-
-<html>
+<html lang="en">
 
 <head>
 
-    <title>LtrustRx Admin</title>
+<meta charset="UTF-8">
 
-    <style>
+<meta name="viewport"
 
-        body {
+content="width=device-width, initial-scale=1.0">
 
-            margin: 0;
+<title>Admin Dashboard</title>
 
-            padding: 30px;
+<style>
 
-            background: #020c2b;
+body{
 
-            color: white;
+background:#020c36;
 
-            font-family: Arial;
+color:white;
 
-        }
+font-family:Arial;
 
+margin:0;
 
-        h1 {
+padding:0;
 
-            color: #38bdf8;
+}
 
-            margin-bottom: 40px;
+.navbar{
 
-        }
+background:#132257;
 
+padding:20px;
 
-        table {
+display:flex;
 
-            width: 100%;
+justify-content:space-between;
 
-            border-collapse: collapse;
+align-items:center;
 
-            background: #132257;
+border-bottom:2px solid #38bdf8;
 
-        }
+position:sticky;
 
+top:0;
 
-        th {
+z-index:9999;
 
-            background: #38bdf8;
+}
 
-            color: black;
+.logo{
 
-            padding: 18px;
+font-size:40px;
 
-            border: 1px solid #1d4ed8;
+font-weight:bold;
 
-        }
+color:#38bdf8;
 
+}
 
-        td {
+.admin-container{
 
-            padding: 16px;
+position:relative;
 
-            border: 1px solid #1d4ed8;
+}
 
-            text-align: center;
+.admin-badge{
 
-        }
+background:#38bdf8;
 
+padding:8px 18px;
 
-        tr:hover {
+border-radius:20px;
 
-            background: #1e3a8a;
+font-weight:bold;
 
-        }
+color:black;
 
-    </style>
+cursor:pointer;
+
+}
+
+.admin-menu{
+
+display:none;
+
+position:absolute;
+
+top:55px;
+
+left:0;
+
+background:#132257;
+
+padding:15px;
+
+border-radius:15px;
+
+width:220px;
+
+box-shadow:0 0 10px black;
+
+z-index:999;
+
+}
+
+.admin-menu a{
+
+display:block;
+
+background:#1e3a8a;
+
+padding:12px;
+
+margin-bottom:10px;
+
+border-radius:10px;
+
+text-decoration:none;
+
+color:white;
+
+font-weight:bold;
+
+}
+
+.profile-container{
+
+position:relative;
+
+}
+
+.profile{
+
+width:55px;
+
+height:55px;
+
+border-radius:50%;
+
+background:#38bdf8;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:28px;
+
+font-weight:bold;
+
+color:black;
+
+cursor:pointer;
+
+}
+
+.profile-menu{
+
+display:none;
+
+position:absolute;
+
+right:0;
+
+top:70px;
+
+background:#132257;
+
+padding:15px;
+
+border-radius:15px;
+
+width:180px;
+
+box-shadow:0 0 10px black;
+
+z-index:999;
+
+}
+
+.upload-btn{
+
+display:block;
+
+background:#38bdf8;
+
+padding:12px;
+
+border-radius:10px;
+
+text-align:center;
+
+font-weight:bold;
+
+cursor:pointer;
+
+margin-bottom:10px;
+
+color:black;
+
+}
+
+.logout-btn{
+
+display:block;
+
+background:red;
+
+padding:12px;
+
+border-radius:10px;
+
+text-align:center;
+
+font-weight:bold;
+
+text-decoration:none;
+
+color:white;
+
+}
+
+.container{
+
+width:98%;
+
+margin:auto;
+
+margin-top:30px;
+
+}
+
+h1{
+
+color:#38bdf8;
+
+margin-bottom:20px;
+
+}
+
+table{
+
+width:100%;
+
+border-collapse:collapse;
+
+background:#132257;
+
+}
+
+th{
+
+background:#38bdf8;
+
+color:black;
+
+padding:18px;
+
+border:1px solid #2563eb;
+
+font-size:22px;
+
+}
+
+td{
+
+padding:18px;
+
+border:1px solid #2563eb;
+
+text-align:center;
+
+font-size:20px;
+
+}
+
+tr:nth-child(even){
+
+background:#182766;
+
+}
+
+</style>
 
 </head>
 
 <body>
 
-    <h1>
+<div class="navbar">
 
-        Admin Scan History Dashboard 🚀
+<div style="
+display:flex;
+align-items:center;
+gap:15px;
+">
 
-    </h1>
+<div class="logo">
+
+LtrustRx 🚀
+
+</div>
+
+<div class="admin-container">
+
+<div class="admin-badge"
+
+onclick="toggleAdminMenu()">
+
+Admin
+
+</div>
+
+<div class="admin-menu"
+
+id="adminMenu">
+
+<a href="/scan/ui">
+
+Dashboard
+
+</a>
+
+<a href="/admin">
+
+Admin Panel
+
+</a>
+
+<a href="#">
+
+User Management
+
+</a>
+
+<a href="#">
+
+Audit Logs
+
+</a>
+
+<a href="#">
+
+AI Security Settings
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="profile-container">
+
+<div class="profile"
+
+onclick="toggleProfileMenu()">
+
+A
+
+</div>
+
+<div class="profile-menu"
+
+id="profileMenu">
+
+<label class="upload-btn">
+
+Upload Photo
+
+<input type="file" hidden>
+
+</label>
+
+<a href="/logout"
+
+class="logout-btn">
+
+Logout
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="container">
+
+<h1>
+
+Admin Scan History Dashboard 🚀
+
+</h1>
+
+<table>
+
+<tr>
+
+<th>User</th>
+
+<th>Target</th>
+
+<th>Total</th>
+
+<th>High</th>
+
+<th>Medium</th>
+
+<th>Low</th>
+
+<th>Info</th>
+
+<th>Date</th>
+
+</tr>
+
+{% for scan in scans %}
+
+<tr>
+
+<td>{{ scan.username }}</td>
+
+<td>{{ scan.target }}</td>
+
+<td>{{ scan.total }}</td>
+
+<td>{{ scan.high }}</td>
+
+<td>{{ scan.medium }}</td>
+
+<td>{{ scan.low }}</td>
+
+<td>{{ scan.info }}</td>
+
+<td>{{ scan.created_at }}</td>
+
+</tr>
+
+{% endfor %}
+
+</table>
+
+</div>
+
+<script>
+
+function toggleAdminMenu(){
+
+let menu=document.getElementById(
+
+'adminMenu'
+
+);
+
+if(menu.style.display==='block'){
+
+menu.style.display='none';
+
+}
+
+else{
+
+menu.style.display='block';
+
+}
+
+}
 
 
-    <table>
+function toggleProfileMenu(){
 
-        <thead>
+let menu=document.getElementById(
 
-            <tr>
+'profileMenu'
 
-                <th>User</th>
+);
 
-                <th>Target</th>
+if(menu.style.display==='block'){
 
-                <th>Total</th>
+menu.style.display='none';
 
-                <th>High</th>
+}
 
-                <th>Medium</th>
+else{
 
-                <th>Low</th>
+menu.style.display='block';
 
-                <th>Info</th>
+}
 
-                <th>Date</th>
+}
 
-            </tr>
-
-        </thead>
-
-
-        <tbody>
-
-            {% for row in history %}
-
-            <tr>
-
-                <td>{{ row[0] }}</td>
-
-                <td>{{ row[1] }}</td>
-
-                <td>{{ row[2] }}</td>
-
-                <td>{{ row[3] }}</td>
-
-                <td>{{ row[4] }}</td>
-
-                <td>{{ row[5] }}</td>
-
-                <td>{{ row[6] }}</td>
-
-                <td>{{ row[7] }}</td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
+</script>
 
 </body>
 

@@ -5,9 +5,6 @@ from fastapi import Form
 from fastapi.templating import Jinja2Templates
 
 from modules.scanner import run_healthcare_scan
-from modules.database import save_scan_history
-
-from modules.report_generator import generate_pdf_report
 
 from datetime import datetime
 
@@ -17,13 +14,23 @@ router = APIRouter()
 templates = Jinja2Templates(directory="templates")
 
 
-# RATE LIMIT STORE
+SCAN_HISTORY = []
 
-RATE_LIMIT_TRACKER = {}
+
+@router.get("/scan/ui")
+async def scan_ui(request: Request):
+
+    return templates.TemplateResponse(
+
+        request=request,
+
+        name="index.html"
+
+    )
 
 
 @router.post("/scan/ui")
-async def ui_scan(
+async def run_scan(
 
     request: Request,
 
@@ -31,112 +38,39 @@ async def ui_scan(
 
 ):
 
-    user = request.cookies.get("user")
-
-
-    # CHECK LOGIN
-
-    if not user:
-
-        return templates.TemplateResponse(
-
-            request=request,
-
-            name="login.html",
-
-            context={
-
-                "error": "Please login first"
-
-            }
-
-        )
-
-
-    # RATE LIMITING
-
-    current_time = datetime.now().timestamp()
-
-
-    if user not in RATE_LIMIT_TRACKER:
-
-        RATE_LIMIT_TRACKER[user] = []
-
-
-    # KEEP ONLY LAST 60 SECONDS
-
-    RATE_LIMIT_TRACKER[user] = [
-
-        t for t in RATE_LIMIT_TRACKER[user]
-
-        if current_time - t < 60
-
-    ]
-
-
-    # MAX 5 REQUESTS
-
-    if len(RATE_LIMIT_TRACKER[user]) >= 5:
-
-        return templates.TemplateResponse(
-
-            request=request,
-
-            name="index.html",
-
-            context={
-
-                "error":
-
-                "Too many scan requests. Please wait."
-
-            }
-
-        )
-
-
-    RATE_LIMIT_TRACKER[user].append(
-
-        current_time
-
-    )
-
-
-    # RUN SCANNER
-
     results = run_healthcare_scan(target)
 
 
-    summary = results["summary"]
+    SCAN_HISTORY.insert(
 
+        0,
 
-    # SAVE TO DATABASE
+        {
 
-    save_scan_history(
+            "username": "admin",
 
-        username=user,
+            "target": target,
 
-        target=target,
+            "total": results["summary"]["total"],
 
-        total=summary["total"],
+            "high": results["summary"]["high"],
 
-        high=summary["high"],
+            "medium": results["summary"]["medium"],
 
-        medium=summary["medium"],
+            "low": results["summary"]["low"],
 
-        low=summary["low"],
+            "info": results["summary"]["info"],
 
-        info=summary["info"]
+            "created_at": datetime.now().strftime(
+
+                "%Y-%m-%d %H:%M:%S"
+
+            )
+
+        }
 
     )
 
-
-    # GENERATE PDF REPORT
-
-    report_file = generate_pdf_report(results)
-
-
-    # RETURN PAGE
 
     return templates.TemplateResponse(
 
@@ -146,9 +80,25 @@ async def ui_scan(
 
         context={
 
-            "results": results,
+            "results": results
 
-            "report_file": report_file
+        }
+
+    )
+
+
+@router.get("/admin")
+async def admin_dashboard(request: Request):
+
+    return templates.TemplateResponse(
+
+        request=request,
+
+        name="admin.html",
+
+        context={
+
+            "scans": SCAN_HISTORY
 
         }
 
