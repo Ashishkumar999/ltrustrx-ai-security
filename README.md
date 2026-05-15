@@ -4,6 +4,26 @@ LtrustRx is an enterprise-style GenAI Security Testing Platform designed to simu
 
 ---
 
+## Architecture Diagram
+
+![LtrustRx Architecture](images/architecture.png)
+
+---
+
+## Dashboard Preview
+
+### Main Dashboard
+![Dashboard](images/dashboard.png)
+
+### Admin Dashboard
+![Admin](images/admin.png)
+
+### Scan Results
+![Results](images/scan-results.png)
+
+---
+
+
 ## Features
 
 - Prompt Injection Testing
